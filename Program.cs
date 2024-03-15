@@ -8,7 +8,7 @@ var connection = builder.Configuration.GetConnectionString("connection");
 
 builder.Services.AddDbContext<ContextDb>(x=> x.UseSqlServer(connection));
 builder.Services.AddControllers();
-
+builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
