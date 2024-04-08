@@ -30,6 +30,8 @@ namespace PeliculasAPI.Controllers
         [HttpGet("{id:int}",Name ="GetByIdGenero")]
         public async Task<ActionResult<GenerosDTO>> GeneroById(int id)
         {
+            if (string.IsNullOrEmpty(id.ToString())) { return BadRequest("No se permiten valores vacio"); }
+
             var genero = await contextDb.Generos.FirstOrDefaultAsync(x => x.Id == id);
 
             if (genero != null)
@@ -38,6 +40,19 @@ namespace PeliculasAPI.Controllers
             }
 
             return BadRequest("No se encontro el elemneto");
+        }
+
+        [HttpPost(Name ="PostGenero")]
+        public async Task<ActionResult> Post([FromBody] GeneroCreacionDTO dTO)
+        {
+            if (ModelState.IsValid)
+            {
+                var genero = mapper.Map<Genero>(dTO);
+                await contextDb.Generos.AddAsync(genero);
+                await contextDb.SaveChangesAsync();
+            }
+
+            return BadRequest("no se guarado");
         }
     }
 }
