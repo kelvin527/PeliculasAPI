@@ -42,17 +42,47 @@ namespace PeliculasAPI.Controllers
             return BadRequest("No se encontro el elemneto");
         }
 
-        [HttpPost(Name ="PostGenero")]
+        [HttpPost]
         public async Task<ActionResult> Post([FromBody] GeneroCreacionDTO dTO)
         {
-            if (ModelState.IsValid)
-            {
+            
+            
                 var genero = mapper.Map<Genero>(dTO);
-                await contextDb.Generos.AddAsync(genero);
+                contextDb.Generos.Add(genero);
                 await contextDb.SaveChangesAsync();
+
+                var generoDOT = mapper.Map<GenerosDTO>(genero);
+
+                return new CreatedAtRouteResult("GetByIdGenero", new {id = generoDOT.Id},generoDOT);
+            
+
+           
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromBody] GeneroCreacionDTO dTO)
+        {
+            var entidad = mapper.Map<Genero>(dTO);
+            entidad.Id = id;
+            contextDb.Entry(entidad).State = EntityState.Modified;
+            await contextDb.SaveChangesAsync();
+
+            return NoContent ();
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<ActionResult> Delete(int id)
+        {
+            var existe = await contextDb.Generos.AnyAsync(x=> x.Id ==id);
+
+            if (!existe)
+            {
+                return NotFound();
             }
 
-            return BadRequest("no se guarado");
+            contextDb.Remove( new  Genero { Id = id});
+            await contextDb.SaveChangesAsync();
+            return NoContent ();
         }
     }
 }
